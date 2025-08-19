@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Contador de dias restantes para o limite de recebimento do carro"
+    />
+    <title>Countdown - Dias Restantes</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: white;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 40px 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        line-height: 1.3;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-bottom: 40px;
+        font-weight: 400;
+      }
+
+      .countdown-display {
+        margin: 30px 0;
+      }
+
+      .days-number {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        line-height: 1;
+      }
+
+      .days-label {
+        font-size: 1.1rem;
+        font-weight: 500;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .progress-container {
+        margin: 40px 0 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        height: 12px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 20px;
+        transition: width 0.3s ease;
+        position: relative;
+      }
+
+      .progress-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 100%
+        );
+        animation: shimmer 2s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .progress-text {
+        font-size: 0.9rem;
+        margin-top: 15px;
+        opacity: 0.8;
+        font-weight: 500;
+      }
+
+      .date-info {
+        margin-top: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .date-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 8px 0;
+        font-size: 0.85rem;
+      }
+
+      .date-label {
+        opacity: 0.8;
+        font-weight: 500;
+      }
+
+      .date-value {
+        font-weight: 600;
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 480px) {
+        .container {
+          padding: 30px 20px;
+          margin: 0 10px;
+        }
+
+        .title {
+          font-size: 1.2rem;
+        }
+
+        .days-number {
+          font-size: 3.5rem;
+        }
+
+        .date-info {
+          padding: 15px;
+        }
+
+        .date-row {
+          font-size: 0.8rem;
+        }
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Dias restantes para você receber seu carro Talita</h1>
+
+      <div class="countdown-display">
+        <div class="days-number pulse" id="daysNumber">--</div>
+        <div class="days-label">dias</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">Carregando...</div>
+
+      <div class="date-info">
+        <div class="date-row">
+          <span class="date-label">Data de início:</span>
+          <span class="date-value" id="startDate">24/07/2025</span>
+        </div>
+        <div class="date-row">
+          <span class="date-label">Data limite:</span>
+          <span class="date-value" id="endDate">--</span>
+        </div>
+        <div class="date-row">
+          <span class="date-label">Hoje:</span>
+          <span class="date-value" id="currentDate">--</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Configuração do contador
+      const startDate = new Date("2025-07-24T00:00:00");
+      const totalDays = 75;
+      const endDate = new Date(
+        startDate.getTime() + totalDays * 24 * 60 * 60 * 1000
+      );
+
+      // Elementos DOM
+      const daysNumberEl = document.getElementById("daysNumber");
+      const progressBarEl = document.getElementById("progressBar");
+      const progressTextEl = document.getElementById("progressText");
+      const startDateEl = document.getElementById("startDate");
+      const endDateEl = document.getElementById("endDate");
+      const currentDateEl = document.getElementById("currentDate");
+
+      // Formatação de datas
+      function formatDate(date) {
+        return date.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      }
+
+      function formatDateExtended(date) {
+        return date.toLocaleDateString("pt-BR", {
+          weekday: "short",
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      // Atualização do contador
+      function updateCountdown() {
+        const now = new Date();
+        const currentTime = now.getTime();
+        const startTime = startDate.getTime();
+        const endTime = endDate.getTime();
+
+        // Atualizar data atual
+        currentDateEl.textContent = formatDateExtended(now);
+
+        // Verificar se estamos antes da data de início
+        if (currentTime < startTime) {
+          const daysUntilStart = Math.ceil(
+            (startTime - currentTime) / (1000 * 60 * 60 * 24)
+          );
+          daysNumberEl.textContent = daysUntilStart;
+          progressBarEl.style.width = "0%";
+          progressTextEl.textContent = `Faltam ${daysUntilStart} dias para iniciar a contagem`;
+          return;
+        }
+
+        // Verificar se já passou da data limite
+        if (currentTime > endTime) {
+          daysNumberEl.textContent = "0";
+          progressBarEl.style.width = "100%";
+          progressTextEl.textContent = "Prazo encerrado";
+          daysNumberEl.style.color = "#ff6b6b";
+          return;
+        }
+
+        // Calcular dias restantes
+        const timeRemaining = endTime - currentTime;
+        const daysRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60 * 24));
+
+        // Calcular progresso
+        const timeElapsed = currentTime - startTime;
+        const totalTime = endTime - startTime;
+        const progress = (timeElapsed / totalTime) * 100;
+
+        // Atualizar elementos
+        daysNumberEl.textContent = daysRemaining;
+        progressBarEl.style.width = Math.min(progress, 100) + "%";
+
+        // Texto do progresso
+        const daysPassed = totalDays - daysRemaining;
+        progressTextEl.textContent = `${daysPassed} de ${totalDays} dias (${Math.round(
+          progress
+        )}%)`;
+
+        // Cores baseadas no tempo restante
+        if (daysRemaining <= 7) {
+          daysNumberEl.style.color = "#ff6b6b";
+        } else if (daysRemaining <= 14) {
+          daysNumberEl.style.color = "#feca57";
+        } else {
+          daysNumberEl.style.color = "white";
+        }
+      }
+
+      // Inicialização
+      function init() {
+        // Configurar datas fixas
+        startDateEl.textContent = formatDate(startDate);
+        endDateEl.textContent = formatDate(endDate);
+
+        // Primeira atualização
+        updateCountdown();
+
+        // Atualizar a cada segundo
+        setInterval(updateCountdown, 1000);
+      }
+
+      // Iniciar quando a página carregar
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>
